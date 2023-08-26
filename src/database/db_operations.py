@@ -1,38 +1,39 @@
 import psycopg2
-import os
 from configparser import ConfigParser
 
-# Read database configuration from a config file
 config = ConfigParser()
-config.read('config.ini')  # Place your config file in the same directory as your script
+config.read('../../config.ini')
 
-# Get database connection details from the config file
-dbname = config.get('database', 'dbname')
+db_name = config.get('database', 'dbname')
 user = config.get('database', 'user')
 password = config.get('database', 'password')
 host = config.get('database', 'host')
 
-# Function to connect to the database
+
 def connect_to_db():
     try:
         conn = psycopg2.connect(
-            dbname=dbname,
+            dbname=db_name,
             user=user,
             password=password,
             host=host
         )
         return conn
     except Exception as e:
-        print("Error:", e)
+        print("Error in connect_to_db():", e)
         return None
 
-# Function to perform database operations (example)
+
 def fetch_data():
     conn = connect_to_db()
+    table_name = "test"
     if conn:
         try:
             cursor = conn.cursor()
-            cursor.execute("SELECT * FROM your_table")
+
+            select_from = "SELECT * FROM {}".format(table_name)
+
+            cursor.execute(select_from)
             rows = cursor.fetchall()
             return rows
         except Exception as e:
