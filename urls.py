@@ -1,18 +1,46 @@
 import requests
-import auth_token
 import time
 
+
+def get_token():
+    file_path = "auth_token.txt"
+
+    with open(file_path, "r") as file:
+        file_content = file.read()
+        return file_content
+
+
+auth_token = get_token()
 session = requests.session()
 session.base_url = "https://api.spacetraders.io/v2/"
-headers = {'Authorization': 'Bearer ' + auth_token.auth_token, 'Accept': 'application/json'}
+headers = {'Authorization': 'Bearer ' + auth_token, 'Accept': 'application/json'}
 session.headers = headers
-
-ratelim = 0.5
 
 
 def queue(result):
+    ratelim = 0.5
     time.sleep(ratelim)
     return result
+
+
+def create_new(symbol, faction, email):
+    """
+    Create a new Agent
+
+    Parameters:
+        symbol (str): Your desired agent symbol.
+        faction (str): The symbol of the faction.
+        email (str): Your Email address.
+
+    Returns:
+        dict: Result of the cargo delivery operation.
+    """
+    payload = {
+        "symbol": symbol,
+        "faction": faction,
+        "email": email
+    }
+    return queue(requests.post("https://api.spacetraders.io/v2/register", json=payload).json())
 
 
 def get_status():
