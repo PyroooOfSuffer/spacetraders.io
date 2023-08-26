@@ -1,7 +1,4 @@
-from urls import *
-import logging
-
-logging.basicConfig(filename="log", filemode="w", level=logging.INFO, format="%(levelname)s:%(message)s")
+from spacetrader_api import *
 
 
 def create_token(symbol, faction, email):

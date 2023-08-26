@@ -1,4 +1,4 @@
-import urls
+import spacetrader_api
 import inspect
 
 
@@ -44,7 +44,7 @@ def build_urls_dict(module):
 
 
 def console():
-    urls_dict = build_urls_dict(urls)
+    urls_dict = build_urls_dict(spacetrader_api)
 
     while True:
         command = input("> ")

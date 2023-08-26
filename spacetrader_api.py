@@ -33,7 +33,7 @@ def create_new(symbol, faction, email):
         email (str): Your Email address.
 
     Returns:
-        dict: Result of the cargo delivery operation.
+        dict: My Agent information plus token!
     """
     payload = {
         "symbol": symbol,
@@ -96,8 +96,8 @@ def list_contracts(page=1, lim=10):
     List contracts with optional pagination.
 
     Parameters:
-        page (int, optional): Page number for pagination (default is 1).
-        lim (int, optional): Limit of contracts per page (default is 10).
+        page (int): Page number for pagination (default is 1).
+        lim (int): Limit of contracts per page (default is 10).
 
     Returns:
         dict: List of contracts based on pagination settings.
@@ -171,8 +171,8 @@ def list_faction(page=1, lim=10):
     List factions with optional pagination.
 
     Parameters:
-        page (int, optional): Page number for pagination (default is 1).
-        lim (int, optional): Limit of factions per page (default is 10).
+        page (int): Page number for pagination (default is 1).
+        lim (int): Limit of factions per page (default is 10).
 
     Returns:
         dict: List of factions according to the specified page and limit.
@@ -199,8 +199,8 @@ def list_ships(page=1, lim=10):
     List ships with optional pagination.
 
     Parameters:
-        page (int, optional): Page number for pagination (default is 1).
-        lim (int, optional): Limit of ships per page (default is 10).
+        page (int): Page number for pagination (default is 1).
+        lim (int): Limit of ships per page (default is 10).
 
     Returns:
         dict: List of ships according to the specified page and limit.
@@ -623,8 +623,8 @@ def list_system(page=1, lim=10):
     List systems in the SpaceTraders universe.
 
     Parameters:
-        page (int, optional): Page number of the system list (default is 1).
-        lim (int, optional): Limit of systems per page (default is 10).
+        page (int): Page number of the system list (default is 1).
+        lim (int): Limit of systems per page (default is 10).
 
     Returns:
         dict: List of systems with pagination information.
@@ -652,8 +652,8 @@ def list_waypoints(system_symbol, page=1, lim=10):
 
     Parameters:
         system_symbol (str): Symbol of the system for which to list waypoints.
-        page (int, optional): Page number of the waypoint list (default is 1).
-        lim (int, optional): Limit of waypoints per page (default is 10).
+        page (int): Page number of the waypoint list (default is 1).
+        lim (int): Limit of waypoints per page (default is 10).
 
     Returns:
         dict: List of waypoints within the specified system with pagination information.
@@ -719,4 +719,3 @@ def get_jump_gate(system_symbol, waypoint_symbol):
     """
     return queue(session.get(
         session.base_url + "/systems/" + system_symbol + "/waypoints/" + waypoint_symbol + "/jump-gate").json())
-
