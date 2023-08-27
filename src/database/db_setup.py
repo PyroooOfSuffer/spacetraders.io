@@ -47,30 +47,39 @@ def drop_database():
 
 
 def create_database():
-    conn = psycopg2.connect(
-        dbname="postgres",
-        user=user,
-        password=password,
-        host=host
-    )
-    if conn:
-        try:
-            drop_database()
-            conn.autocommit = True
-            cursor = conn.cursor()
+    confirmation = input(f"Are you sure you want to create the NEW database '{db_name}'? (yes/no): ")
 
-            create_query = "CREATE DATABASE {}".format(db_name)
+    if confirmation.lower() != "yes":
+        print("Database creation aborted.")
+        return
+    try:
+        conn = psycopg2.connect(
+            dbname="postgres",
+            user=user,
+            password=password,
+            host=host
+        )
+        if conn:
+            try:
+                drop_database()
+                conn.autocommit = True
+                cursor = conn.cursor()
 
-            cursor.execute(create_query)
-            print(f"Database {db_name} created successfully")
-        except Exception as e:
-            print(f"Error creating database {db_name}:", e)
-        finally:
-            conn.close()
+                create_query = "CREATE DATABASE {}".format(db_name)
+
+                cursor.execute(create_query)
+                print(f"Database {db_name} created successfully")
+            except Exception as e:
+                print(f"Error creating database {db_name}:", e)
+            finally:
+                conn.close()
+    except psycopg2.Error as e:
+        print("Error connecting to PostgreSQL:", e)
 
 
-def create_table(table_name):
+def create_test_table():
     conn = connect_to_db()
+    table_name = "test"
     if conn:
         try:
             cursor = conn.cursor()
@@ -92,8 +101,9 @@ def create_table(table_name):
             conn.close()
 
 
-def insert_sample_data(table_name):
+def insert_sample_data_in_test():
     conn = connect_to_db()
+    table_name = "test"
     if conn:
         try:
             cursor = conn.cursor()
@@ -112,5 +122,5 @@ def insert_sample_data(table_name):
 
 if __name__ == "__main__":
     create_database()
-    create_table("test")
-    insert_sample_data("test")
+    create_test_table()
+    insert_sample_data_in_test()
