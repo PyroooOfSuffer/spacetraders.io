@@ -120,6 +120,29 @@ def insert_sample_data_in_test():
             conn.close()
 
 
+def create_table(table_name, columns, infer_column_type):
+    conn = connect_to_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+
+            column_definitions = ", ".join([f"{col} {infer_column_type(value)}" for col, value in columns.items()])
+
+            create_query = f"""
+                CREATE TABLE {table_name} (
+                    id SERIAL PRIMARY KEY,
+                    {column_definitions}
+                );
+            """
+            cursor.execute(create_query)
+            conn.commit()
+            print(f"Table {table_name} created successfully")
+        except Exception as e:
+            print(f"Error creating table {table_name}:", e)
+        finally:
+            conn.close()
+
+
 if __name__ == "__main__":
     create_database()
     create_test_table()

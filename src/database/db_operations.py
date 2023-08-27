@@ -2,7 +2,6 @@ import psycopg2
 from configparser import ConfigParser
 import db_setup
 
-
 config = ConfigParser()
 config.read('../../config.ini')
 
@@ -41,6 +40,10 @@ def fetch_data(table_name):
             print("Error:", e)
         finally:
             conn.close()
+
+
+def create_table(table_name, columns, infer_column_type):
+    db_setup.create_table(table_name, columns, infer_column_type)
 
 
 print(fetch_data())
