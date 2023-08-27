@@ -42,8 +42,35 @@ def fetch_data(table_name):
             conn.close()
 
 
-def create_table(table_name, columns, infer_column_type):
-    db_setup.create_table(table_name, columns, infer_column_type)
+# [k1, k2]
+# [['v11', 'v12], []]
+def insert_sample_data_in_test(table_name, keys, values_list):
+    conn = connect_to_db()
+    if conn:
+        try:
+            cursor = conn.cursor()
+
+            data_strs = []
+            for values in values_list:
+                keys_str = ", ".join(keys)
+                data_str = ", ".join(values)
+                data_strs.append(f"({data_str})")
+                # data: 'pyrooo-1', {'a':1} (v1, v2)
 
 
-print(fetch_data())
+            all_data_strs = ", ".join(data_strs)
+            insert_query = f"INSERT INTO {table_name} ({keys_str}) VALUES [{all_data_strs}]"
+            data = [('John', 25), ('Jane', 30)]
+
+            cursor.executemany(insert_query, data)
+            conn.commit()
+            print(f"Sample data inserted into {table_name} successfully")
+        except Exception as e:
+            print(f"Error inserting data into {table_name}:", e)
+        finally:
+            conn.close()
+
+
+def create_table(table_name, columns_dict):
+    db_setup.create_table(table_name, columns_dict)
+

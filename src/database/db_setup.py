@@ -120,13 +120,13 @@ def insert_sample_data_in_test():
             conn.close()
 
 
-def create_table(table_name, columns, infer_column_type):
+def create_table(table_name, columns_dict):
     conn = connect_to_db()
     if conn:
         try:
             cursor = conn.cursor()
 
-            column_definitions = ", ".join([f"{col} {infer_column_type(value)}" for col, value in columns.items()])
+            column_definitions = ", ".join([f"{col} {col_type}" for col, col_type in columns_dict.items()])
 
             create_query = f"""
                 CREATE TABLE {table_name} (
