@@ -20,7 +20,7 @@ def connect_to_db():
         )
         return conn
     except Exception as e:
-        print("Error in connect_to_db()::", e)
+        print("Error in connect_to_db():", e)
         return None
 
 

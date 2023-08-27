@@ -1,4 +1,3 @@
-import psycopg2
 from spacetrader_api import *
 import sys
 sys.path.append("../database")
@@ -15,7 +14,7 @@ def create_token(symbol, faction, email):
     print(f"Token generated in {file_path}")
 
 
-def get_ships_keys():
+def get_ship_db_keys():
     response = list_ships()
     if response["meta"]["total"] > response["meta"]["limit"]:
         "f"
@@ -38,5 +37,5 @@ def infer_column_type(value):
 
 
 if __name__ == "__main__":
-    data = get_ships_keys()
+    data = get_ship_db_keys()
     db_operations.create_table("ship_data", data)
