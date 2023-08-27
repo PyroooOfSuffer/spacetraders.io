@@ -1,5 +1,7 @@
 import psycopg2
 from configparser import ConfigParser
+import db_setup
+
 
 config = ConfigParser()
 config.read('../../config.ini')
@@ -24,9 +26,8 @@ def connect_to_db():
         return None
 
 
-def fetch_data():
+def fetch_data(table_name):
     conn = connect_to_db()
-    table_name = "test"
     if conn:
         try:
             cursor = conn.cursor()
@@ -40,3 +41,6 @@ def fetch_data():
             print("Error:", e)
         finally:
             conn.close()
+
+
+print(fetch_data())

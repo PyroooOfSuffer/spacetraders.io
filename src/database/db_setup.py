@@ -33,12 +33,6 @@ def drop_database():
     )
     if conn:
         try:
-            conn = psycopg2.connect(
-                dbname="postgres",
-                user=user,
-                password=password,
-                host=host
-            )
             conn.autocommit = True
             cursor = conn.cursor()
 
@@ -62,12 +56,6 @@ def create_database():
     if conn:
         try:
             drop_database()
-            conn = psycopg2.connect(
-                dbname="postgres",
-                user=user,
-                password=password,
-                host=host
-            )
             conn.autocommit = True
             cursor = conn.cursor()
 
@@ -81,9 +69,8 @@ def create_database():
             conn.close()
 
 
-def create_table():
+def create_table(table_name):
     conn = connect_to_db()
-    table_name = "test"
     if conn:
         try:
             cursor = conn.cursor()
@@ -97,6 +84,7 @@ def create_table():
             """.format(table_name)
 
             cursor.execute(create_query)
+            conn.commit()
             print(f"Table {table_name} created successfully")
         except Exception as e:
             print(f"Error creating table {table_name}:", e)
@@ -104,9 +92,8 @@ def create_table():
             conn.close()
 
 
-def insert_sample_data():
+def insert_sample_data(table_name):
     conn = connect_to_db()
-    table_name = "test"
     if conn:
         try:
             cursor = conn.cursor()
@@ -125,5 +112,5 @@ def insert_sample_data():
 
 if __name__ == "__main__":
     create_database()
-    create_table()
-    insert_sample_data()
+    create_table("test")
+    insert_sample_data("test")

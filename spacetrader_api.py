@@ -1,9 +1,11 @@
 import requests
 import time
+import os
 
 
 def get_token():
-    file_path = "auth_token.txt"
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    file_path = os.path.join(current_dir, "auth_token.txt")
 
     with open(file_path, "r") as file:
         file_content = file.read()
