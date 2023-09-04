@@ -13,8 +13,10 @@ def create_token(symbol, faction, email):
     print(f"Token generated in {file_path}")
 
 
-def get_ships_keys():
+def get_ship_db_keys():
     response = list_ships()
+    if response["meta"]["total"] > response["meta"]["limit"]:
+        "f"
     ship_data = response["data"]
     return {key: infer_column_type(value) for (key, value) in ship_data[0].items()}
 

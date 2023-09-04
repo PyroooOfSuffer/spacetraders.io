@@ -42,7 +42,7 @@ def fetch_data(table_name):
             conn.close()
 
 
-def insert_sample_data_in_test(table_name, keys, values_list):
+def insert_data(table_name, keys, values_list):
     conn = connect_to_db()
     if conn:
         try:
@@ -53,6 +53,8 @@ def insert_sample_data_in_test(table_name, keys, values_list):
                 keys_str = ", ".join(keys)
                 data_str = ", ".join(values)
                 data_strs.append(f"({data_str})")
+                # data: 'pyrooo-1', {'a':1} (v1, v2)
+
 
             all_data_strs = ", ".join(data_strs)
             insert_query = f"INSERT INTO {table_name} ({keys_str}) VALUES [{all_data_strs}]"
