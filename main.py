@@ -117,4 +117,4 @@ def console():
 
 
 if __name__ == "__main__":
-    bot_utils.get_ship_data()
+    bot_utils.get_ship_db_data()

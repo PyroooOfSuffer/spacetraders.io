@@ -13,10 +13,24 @@ def create_token(symbol, faction, email):
     print(f"Token generated in {file_path}")
 
 
+def get_ship_db_data(lim=1):
+    response = list_ships(lim=lim)
+    if response["meta"]["total"] > response["meta"]["limit"]:
+        total_pages = response["meta"]["total"]/lim
+        ship_data = {}
+        for pages in total_pages:
+            new_response = list_ships(lim=lim, page=pages)
+            ship_data.update(new_response["data"])
+            print(ship_data)
+    elif response["meta"]["total"] <= response["meta"]["limit"]:
+        ship_data = response["data"]
+        print(ship_data)
+
+    return
+
+
 def get_ship_db_keys():
     response = list_ships()
-    if response["meta"]["total"] > response["meta"]["limit"]:
-        "f"
     ship_data = response["data"]
     return {key: infer_column_type(value) for (key, value) in ship_data[0].items()}
 
@@ -32,8 +46,3 @@ def infer_column_type(value):
         return "JSONB"
     else:
         raise ValueError(f"Unsupported data type: {type(value)}")
-
-
-if __name__ == "__main__":
-    data = get_ships_keys()
-    db_operations.create_table("ship_data", data)
