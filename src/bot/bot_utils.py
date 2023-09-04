@@ -34,13 +34,6 @@ def infer_column_type(value):
         raise ValueError(f"Unsupported data type: {type(value)}")
 
 
-def get_ship_data(lim=1):
-    response = list_ships(lim=lim)
-    print(response)
-    if response["meta"]["total"] > response["meta"]["limit"]:
-        total_pages = response["meta"]["total"]/lim
-        for page in total_pages:
-            new_response = list_ships(lim=lim, page=page)
-            response["data"].append(new_response)
-            print(new_response)
-
+if __name__ == "__main__":
+    data = get_ships_keys()
+    db_operations.create_table("ship_data", data)
