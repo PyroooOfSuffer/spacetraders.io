@@ -1,8 +1,6 @@
 import psycopg2
 from spacetrader_api import *
-import sys
-sys.path.append("../database")
-import db_operations
+from src.database import db_operations
 
 
 def create_token(symbol, faction, email):
@@ -17,10 +15,7 @@ def create_token(symbol, faction, email):
 
 def get_ships_keys():
     response = list_ships()
-    if response["meta"]["total"] > response["meta"]["limit"]:
-        "f"
     ship_data = response["data"]
-
     return {key: infer_column_type(value) for (key, value) in ship_data[0].items()}
 
 
@@ -37,6 +32,13 @@ def infer_column_type(value):
         raise ValueError(f"Unsupported data type: {type(value)}")
 
 
-if __name__ == "__main__":
-    data = get_ships_keys()
-    db_operations.create_table("ship_data", data)
+def get_ship_data(lim=1):
+    response = list_ships(lim=lim)
+    print(response)
+    if response["meta"]["total"] > response["meta"]["limit"]:
+        total_pages = response["meta"]["total"]/lim
+        for page in total_pages:
+            new_response = list_ships(lim=lim, page=page)
+            response["data"].append(new_response)
+            print(new_response)
+

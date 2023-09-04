@@ -1,9 +1,9 @@
 import psycopg2
 from configparser import ConfigParser
-import db_setup
+from src.database import db_setup
 
 config = ConfigParser()
-config.read('../../config.ini')
+config.read('config.ini')
 
 db_name = config.get('database', 'dbname')
 user = config.get('database', 'user')
@@ -42,8 +42,6 @@ def fetch_data(table_name):
             conn.close()
 
 
-# [k1, k2]
-# [['v11', 'v12], []]
 def insert_sample_data_in_test(table_name, keys, values_list):
     conn = connect_to_db()
     if conn:
@@ -55,8 +53,6 @@ def insert_sample_data_in_test(table_name, keys, values_list):
                 keys_str = ", ".join(keys)
                 data_str = ", ".join(values)
                 data_strs.append(f"({data_str})")
-                # data: 'pyrooo-1', {'a':1} (v1, v2)
-
 
             all_data_strs = ", ".join(data_strs)
             insert_query = f"INSERT INTO {table_name} ({keys_str}) VALUES [{all_data_strs}]"
@@ -73,4 +69,3 @@ def insert_sample_data_in_test(table_name, keys, values_list):
 
 def create_table(table_name, columns_dict):
     db_setup.create_table(table_name, columns_dict)
-

@@ -2,7 +2,7 @@ import psycopg2
 from configparser import ConfigParser
 
 config = ConfigParser()
-config.read('../../config.ini')
+config.read('config.ini')
 
 db_name = config.get('database', 'dbname')
 user = config.get('database', 'user')

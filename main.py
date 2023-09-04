@@ -1,5 +1,6 @@
 import spacetrader_api
 import inspect
+from src.bot import bot_utils
 
 
 def get_parameters_from_docstring(docstring):
@@ -43,11 +44,30 @@ def build_urls_dict(module):
     return urls_dict
 
 
+def build_bot_dict(module):
+    bot_dict = {}
+    for name, func in module.__dict__.items():
+        if callable(func) and func.__doc__:
+            sig = inspect.signature(func)
+            default_values = {}
+
+            bot_dict[name] = (func, default_values)
+    return bot_dict
+
+
 def console():
     urls_dict = build_urls_dict(spacetrader_api)
+    bot_dict = build_bot_dict(bot_utils)
 
     while True:
         command = input("> ")
+        if command in bot_dict:
+            func, default_values = bot_dict[command]
+            try:
+                r = func()
+            except Exception as e:
+                print(f"An error occurred: {e}")
+
         if command in urls_dict:
             func, param_info, default_values = urls_dict[command]
 
@@ -97,4 +117,4 @@ def console():
 
 
 if __name__ == "__main__":
-    console()
+    bot_utils.get_ship_data()
