@@ -2,6 +2,11 @@ import requests
 import time
 import os
 
+"""
+maybe remove .json so i can read the 400-er Error codes first to not continue with false data
+
+"""
+
 
 def get_token():
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -19,10 +24,16 @@ headers = {'Authorization': 'Bearer ' + auth_token, 'Accept': 'application/json'
 session.headers = headers
 
 
-def queue(result):
+def queue(request):
+
     ratelim = 0.5
     time.sleep(ratelim)
-    return result
+    try:
+        response = request
+        return response
+    except Exception as e:
+        print(f"An Error occurred: {e}")
+        raise
 
 
 def register(symbol, faction, email):

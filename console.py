@@ -1,6 +1,17 @@
 import spacetrader_api
 import inspect
 
+"""
+currently able to call all func form spacetrader_api.py manually
+
+add db_operations?
+
+add bot_operation?
+
+"""
+
+
+
 def get_parameters_from_docstring(docstring):
     param_info = []
 
