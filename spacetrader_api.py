@@ -25,7 +25,7 @@ def queue(result):
     return result
 
 
-def create_new(symbol, faction, email):
+def register(symbol, faction, email):
     """
     Create a new Agent
 
@@ -343,7 +343,7 @@ def extract_resources(ship_symbol, survey_full=None):  # will need FIXING
 
     Parameters:
         ship_symbol (str): Symbol of the ship used to extract resources.
-        survey_full (dict): Survey data used for resource extraction. If provided, the extraction will be based on this survey data.
+        survey_full (dict): Survey data used for resource extraction.
 
     Returns:
         dict: Result of the resource extraction operation.

@@ -1,7 +1,34 @@
 import spacetrader_api
 import inspect
-from src.bot import bot_utils
 
+"""
+venv - not on GitHub - 
+> virtual environment for PyCharm
+
+.gitignore
+> which files to not update on GitHub
+
+auth_token.txt - not on GitHub -
+> the token as a single string
+
+console.py
+> allow control of the program over console
+
+config.ini
+> database setup data
+
+database.py
+> create and manage the database and table
+
+main.py
+> call all function
+
+requirements.txt
+> all requirements so PyCharm gets all imports
+
+spacetrader_api.py
+> all requests to API as functions
+"""
 
 def get_parameters_from_docstring(docstring):
     param_info = []
@@ -44,30 +71,11 @@ def build_urls_dict(module):
     return urls_dict
 
 
-def build_bot_dict(module):
-    bot_dict = {}
-    for name, func in module.__dict__.items():
-        if callable(func) and func.__doc__:
-            sig = inspect.signature(func)
-            default_values = {}
-
-            bot_dict[name] = (func, default_values)
-    return bot_dict
-
-
 def console():
     urls_dict = build_urls_dict(spacetrader_api)
-    bot_dict = build_bot_dict(bot_utils)
 
     while True:
         command = input("> ")
-        if command in bot_dict:
-            func, default_values = bot_dict[command]
-            try:
-                r = func()
-            except Exception as e:
-                print(f"An error occurred: {e}")
-
         if command in urls_dict:
             func, param_info, default_values = urls_dict[command]
 
@@ -117,4 +125,4 @@ def console():
 
 
 if __name__ == "__main__":
-    bot_utils.get_ship_db_data()
+    console()
