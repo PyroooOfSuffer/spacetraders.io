@@ -11,7 +11,6 @@ add bot_operation?
 """
 
 
-
 def get_parameters_from_docstring(docstring):
     param_info = []
 

@@ -18,9 +18,6 @@ bot.py
 console.py
 > allow control of the program over console (currently able to use spacetrader_api func)
 
-config.ini  - not code -
-> database setup data
-
 database.py (needed? cant hust define/update global dicts?)
 > create and manage the database and table
 >> data transforming for db here or in bot.py?? or create updater.py?
