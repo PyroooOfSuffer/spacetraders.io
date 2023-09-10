@@ -36,19 +36,22 @@ def connect_to_db(db_name):
 
 
 def create_db(db_name):
-    connection = connect_to_db('postgres')
-    if connection:
-        try:
-            cursor = connection.cursor()
-            cursor.execute(f"CREATE DATABASE {db_name};")
-            connection.commit()
-            cursor.close()
-            connection.close()
-            print(f"Database '{db_name}' created successfully.")
-        except psycopg2.Error as e:
-            print("Error creating the database:", e)
-    else:
-        print("Could not connect to the PostgreSQL server.")
+    try:
+        connection = psycopg2.connect(
+            dbname="postgres",
+            user="postgres",
+            password="X#9sP4*7qYvT",
+            host="localhost"
+        )
+
+        cursor = connection.cursor()
+        cursor.execute(f"CREATE DATABASE {db_name};")
+        cursor.close()
+        connection.close()
+
+        print(f"Database '{db_name}' created successfully.")
+    except psycopg2.Error as e:
+        print("Error creating the database:", e)
 
 
 def drop_db(db_name):
