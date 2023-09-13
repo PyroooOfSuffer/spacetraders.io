@@ -1,6 +1,7 @@
 import console as c
 import simple_automation as sa
 import spacetrader_api as api
+import requests
 
 """
 venv - not on GitHub -   - not code -
@@ -36,4 +37,5 @@ spacetrader_api.py - no change needed -
 """
 
 if __name__ == "__main__":
-    print("send HELP")
+    print("send Help")
+    print(api.get_status())

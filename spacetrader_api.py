@@ -2,11 +2,6 @@ import requests
 import time
 import os
 
-"""
-maybe remove .json so i can read the 400-er Error codes first to not continue with false data
-
-"""
-
 
 def get_token():
     current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -17,20 +12,35 @@ def get_token():
         return file_content
 
 
+# creating a header and base Url for session. 
 auth_token = get_token()
 session = requests.session()
 session.base_url = "https://api.spacetraders.io/v2/"
 headers = {'Authorization': 'Bearer ' + auth_token, 'Accept': 'application/json'}
 session.headers = headers
 
+# for queue
+last_request_time = 0
+
 
 def queue(request):
-
+    global last_request_time
     ratelim = 0.5
     time.sleep(ratelim)
+
+    current_time = time.time()
+    time_since_last_request = current_time - last_request_time
+    if time_since_last_request < ratelim:
+        time.sleep(ratelim - time_since_last_request)
+    last_request_time = time.time()
+
     try:
         response = request
-        return response
+        if response.status_code // 100 == 2:  # Check if it's a 2xx response
+            return response.json()
+        else:
+            print(f"Error: {response.status_code}, {response.text}")
+            return None
     except Exception as e:
         print(f"An Error occurred: {e}")
         raise
@@ -53,7 +63,7 @@ def register(symbol, faction, email):
         "faction": faction,
         "email": email
     }
-    return queue(requests.post("https://api.spacetraders.io/v2/register", json=payload).json())
+    return queue(requests.post("https://api.spacetraders.io/v2/register", json=payload))
 
 
 def get_status():
@@ -63,7 +73,7 @@ def get_status():
     Returns:
         dict: API status information.
     """
-    return queue(session.get(session.base_url).json())
+    return queue(session.get(session.base_url))
 
 
 def get_my_agent():
@@ -73,7 +83,7 @@ def get_my_agent():
     Returns:
         dict: My agent information.
     """
-    return queue(session.get(session.base_url + "my/agent").json())
+    return queue(session.get(session.base_url + "my/agent"))
 
 
 def list_agent(page=1, lim=10):
@@ -88,7 +98,7 @@ def list_agent(page=1, lim=10):
         dict: List of agent.
     """
     querystring = {"page": int(page), "limit": int(lim)}
-    return queue(session.get(session.base_url + "/agents", params=querystring).json())
+    return queue(session.get(session.base_url + "/agents", params=querystring))
 
 
 def get_agent(agent_symbol):
@@ -101,7 +111,7 @@ def get_agent(agent_symbol):
     Returns:
         dict: Detailed agent information.
     """
-    return queue(session.get(session.base_url + "/agents/" + agent_symbol).json())
+    return queue(session.get(session.base_url + "/agents/" + agent_symbol))
 
 
 def list_contracts(page=1, lim=10):
@@ -116,7 +126,7 @@ def list_contracts(page=1, lim=10):
         dict: List of contracts based on pagination settings.
     """
     querystring = {"page": int(page), "limit": int(lim)}
-    return queue(session.get(session.base_url + "/my/contracts", params=querystring).json())
+    return queue(session.get(session.base_url + "/my/contracts", params=querystring))
 
 
 def get_contract(contract_id):
@@ -129,7 +139,7 @@ def get_contract(contract_id):
     Returns:
         dict: Detailed contract information.
     """
-    return queue(session.get(session.base_url + "/my/contracts/" + contract_id).json())
+    return queue(session.get(session.base_url + "/my/contracts/" + contract_id))
 
 
 def accept_contract(contract_id):
@@ -142,7 +152,7 @@ def accept_contract(contract_id):
     Returns:
         dict: Result of the contract acceptance.
     """
-    return queue(session.post(session.base_url + "/my/contracts/" + contract_id + "/accept").json())
+    return queue(session.post(session.base_url + "/my/contracts/" + contract_id + "/accept"))
 
 
 def deliver_cargo_to_contract(contract_id, ship_symbol, trade_symbol, units):
@@ -163,7 +173,7 @@ def deliver_cargo_to_contract(contract_id, ship_symbol, trade_symbol, units):
         "tradeSymbol": trade_symbol,
         "units": int(units)
     }
-    return queue(session.post(session.base_url + "/my/contracts/" + contract_id + "/deliver", json=payload).json())
+    return queue(session.post(session.base_url + "/my/contracts/" + contract_id + "/deliver", json=payload))
 
 
 def fulfill_contract(contract_id):
@@ -176,7 +186,7 @@ def fulfill_contract(contract_id):
     Returns:
         dict: Result of the contract fulfillment operation.
     """
-    return queue(session.post(session.base_url + "/my/contracts/" + contract_id + "/fulfill").json())
+    return queue(session.post(session.base_url + "/my/contracts/" + contract_id + "/fulfill"))
 
 
 def list_faction(page=1, lim=10):
@@ -191,7 +201,7 @@ def list_faction(page=1, lim=10):
         dict: List of factions according to the specified page and limit.
     """
     querystring = {"page": int(page), "limit": int(lim)}
-    return queue(session.get(session.base_url + "/factions", params=querystring).json())
+    return queue(session.get(session.base_url + "/factions", params=querystring))
 
 
 def get_faction(faction_symbol):
@@ -204,7 +214,7 @@ def get_faction(faction_symbol):
     Returns:
         dict: A dictionary containing detailed information about the specified faction.
     """
-    return queue(session.get(session.base_url + "/factions/" + faction_symbol).json())
+    return queue(session.get(session.base_url + "/factions/" + faction_symbol))
 
 
 def list_ships(page=1, lim=10):
@@ -219,7 +229,7 @@ def list_ships(page=1, lim=10):
         dict: List of ships according to the specified page and limit.
     """
     querystring = {"page": int(page), "limit": int(lim)}
-    return queue(session.get(session.base_url + "/my/ships", params=querystring).json())
+    return queue(session.get(session.base_url + "/my/ships", params=querystring))
 
 
 def purchase_ship(ship_type, waypoint_symbol):
@@ -237,7 +247,7 @@ def purchase_ship(ship_type, waypoint_symbol):
         "shipType": ship_type,
         "waypointSymbol": waypoint_symbol
     }
-    return queue(session.post(session.base_url + "/my/ships", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships", json=payload))
 
 
 def get_ship(ship_symbol):
@@ -250,7 +260,7 @@ def get_ship(ship_symbol):
     Returns:
         dict: A dictionary containing detailed information about the specified ship.
     """
-    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol).json())
+    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol))
 
 
 def get_ship_cargo(ship_symbol):
@@ -263,7 +273,7 @@ def get_ship_cargo(ship_symbol):
     Returns:
         dict: A dictionary containing information about the cargo carried by the specified ship.
     """
-    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol + "/cargo").json())
+    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol + "/cargo"))
 
 
 def orbit_ship(ship_symbol):
@@ -276,7 +286,7 @@ def orbit_ship(ship_symbol):
     Returns:
         dict: Result of the orbit command operation.
     """
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/orbit").json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/orbit"))
 
 
 def ship_refine(ship_symbol, produce):
@@ -293,7 +303,7 @@ def ship_refine(ship_symbol, produce):
     payload = {
         "produce": produce
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/refine", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/refine", json=payload))
 
 
 def create_chart(ship_symbol):
@@ -306,7 +316,7 @@ def create_chart(ship_symbol):
     Returns:
         dict: Result of the navigational chart creation operation.
     """
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/chart").json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/chart"))
 
 
 def get_ship_cooldown(ship_symbol):
@@ -319,7 +329,7 @@ def get_ship_cooldown(ship_symbol):
     Returns:
         dict: A dictionary containing information about the current cooldown affecting the specified ship.
     """
-    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol + "/cooldown").json())
+    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol + "/cooldown"))
 
 
 def dock_ship(ship_symbol):
@@ -332,7 +342,7 @@ def dock_ship(ship_symbol):
     Returns:
         dict: Result of the dock command operation.
     """
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/dock").json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/dock"))
 
 
 def create_survey(ship_symbol):
@@ -345,7 +355,7 @@ def create_survey(ship_symbol):
     Returns:
         dict: Result of the resource survey initiation operation.
     """
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/survey").json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/survey"))
 
 
 def extract_resources(ship_symbol, survey_full=None):  # will need FIXING
@@ -363,10 +373,10 @@ def extract_resources(ship_symbol, survey_full=None):  # will need FIXING
     #       "survey": survey_full
     #    }
     if survey_full is None:
-        return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/extract").json())
+        return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/extract"))
     else:
         raise NotImplementedError("survey_full as param for extract_resources not supported")
-    #        return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/extract", json=payload).json())
+    #        return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/extract", json=payload))
 
 
 def jettison_cargo(ship_symbol, goods_symbol, units):
@@ -385,7 +395,7 @@ def jettison_cargo(ship_symbol, goods_symbol, units):
         "symbol": goods_symbol,
         "units": int(units)
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/jettison", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/jettison", json=payload))
 
 
 def jump_ship(ship_symbol, system_symbol):
@@ -402,7 +412,7 @@ def jump_ship(ship_symbol, system_symbol):
     payload = {
         "systemSymbol": system_symbol
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/jump", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/jump", json=payload))
 
 
 def navigate_ship(ship_symbol, waypoint_symbol):
@@ -419,7 +429,7 @@ def navigate_ship(ship_symbol, waypoint_symbol):
     payload = {
         "waypointSymbol": waypoint_symbol
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/navigate", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/navigate", json=payload))
 
 
 def patch_ship_nav(ship_symbol, flight_mode):
@@ -436,7 +446,7 @@ def patch_ship_nav(ship_symbol, flight_mode):
     payload = {
         "flightMode": flight_mode
     }
-    return queue(session.patch(session.base_url + "/my/ships/" + ship_symbol + "/nav", json=payload).json())
+    return queue(session.patch(session.base_url + "/my/ships/" + ship_symbol + "/nav", json=payload))
 
 
 def get_ship_nav(ship_symbol):
@@ -449,7 +459,7 @@ def get_ship_nav(ship_symbol):
     Returns:
         dict: A dictionary containing the navigation settings of the specified ship.
     """
-    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol + "/nav").json())
+    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol + "/nav"))
 
 
 def warp_ship(ship_symbol, waypoint_symbol):
@@ -466,7 +476,7 @@ def warp_ship(ship_symbol, waypoint_symbol):
     payload = {
         "waypointSymbol": waypoint_symbol
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/warp", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/warp", json=payload))
 
 
 def sell_cargo(ship_symbol, goods_symbol, units):
@@ -485,7 +495,7 @@ def sell_cargo(ship_symbol, goods_symbol, units):
         "symbol": goods_symbol,
         "units": int(units)
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/sell", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/sell", json=payload))
 
 
 def scan_system(ship_symbol):
@@ -498,7 +508,7 @@ def scan_system(ship_symbol):
     Returns:
         dict: Result of the system scan operation.
     """
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/scan/systems").json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/scan/systems"))
 
 
 def scan_waypoint(ship_symbol):
@@ -511,7 +521,7 @@ def scan_waypoint(ship_symbol):
     Returns:
         dict: Result of the waypoint scan operation.
     """
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/scan/waypoints").json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/scan/waypoints"))
 
 
 def refuel_ship(ship_symbol, units):
@@ -528,7 +538,7 @@ def refuel_ship(ship_symbol, units):
     payload = {
         "units": int(units)
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/refuel", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/refuel", json=payload))
 
 
 def purchase_cargo(ship_symbol, goods_symbol, units):
@@ -547,7 +557,7 @@ def purchase_cargo(ship_symbol, goods_symbol, units):
         "symbol": goods_symbol,
         "units": int(units)
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/purchase", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/purchase", json=payload))
 
 
 def transfer_cargo(ship_symbol, goods_symbol, units, ship_symbol_target):
@@ -568,7 +578,7 @@ def transfer_cargo(ship_symbol, goods_symbol, units, ship_symbol_target):
         "units": int(units),
         "shipSymbol": ship_symbol_target
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/transfer", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/transfer", json=payload))
 
 
 def negotiate_contract(ship_symbol):
@@ -581,7 +591,7 @@ def negotiate_contract(ship_symbol):
     Returns:
         dict: Result of the contract negotiation initiation.
     """
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/negotiate/contract").json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/negotiate/contract"))
 
 
 def get_mounts(ship_symbol):
@@ -594,7 +604,7 @@ def get_mounts(ship_symbol):
     Returns:
         dict: Information about the mounts on the ship.
     """
-    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol + "/mounts").json())
+    return queue(session.get(session.base_url + "/my/ships/" + ship_symbol + "/mounts"))
 
 
 def install_mount(ship_symbol, mount_symbol):
@@ -611,7 +621,7 @@ def install_mount(ship_symbol, mount_symbol):
     payload = {
         "symbol": mount_symbol,
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/mounts/install", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/mounts/install", json=payload))
 
 
 def remove_mount(ship_symbol, mount_symbol):
@@ -628,7 +638,7 @@ def remove_mount(ship_symbol, mount_symbol):
     payload = {
         "symbol": mount_symbol,
     }
-    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/mounts/remove", json=payload).json())
+    return queue(session.post(session.base_url + "/my/ships/" + ship_symbol + "/mounts/remove", json=payload))
 
 
 def list_system(page=1, lim=10):
@@ -643,7 +653,7 @@ def list_system(page=1, lim=10):
         dict: List of systems with pagination information.
     """
     querystring = {"page": int(page), "limit": int(lim)}
-    return queue(session.get(session.base_url + "/systems", params=querystring).json())
+    return queue(session.get(session.base_url + "/systems", params=querystring))
 
 
 def get_system(system_symbol):
@@ -656,7 +666,7 @@ def get_system(system_symbol):
     Returns:
         dict: Detailed information about the specified system.
     """
-    return queue(session.get(session.base_url + "/systems/" + system_symbol).json())
+    return queue(session.get(session.base_url + "/systems/" + system_symbol))
 
 
 def list_waypoints(system_symbol, page=1, lim=10):
@@ -672,7 +682,7 @@ def list_waypoints(system_symbol, page=1, lim=10):
         dict: List of waypoints within the specified system with pagination information.
     """
     querystring = {"page": int(page), "limit": int(lim)}
-    return queue(session.get(session.base_url + "/systems/" + system_symbol + "/waypoints", params=querystring).json())
+    return queue(session.get(session.base_url + "/systems/" + system_symbol + "/waypoints", params=querystring))
 
 
 def get_waypoint(system_symbol, waypoint_symbol):
@@ -686,7 +696,7 @@ def get_waypoint(system_symbol, waypoint_symbol):
     Returns:
         dict: Detailed information about the specified waypoint.
     """
-    return queue(session.get(session.base_url + "/systems/" + system_symbol + "/waypoints/" + waypoint_symbol).json())
+    return queue(session.get(session.base_url + "/systems/" + system_symbol + "/waypoints/" + waypoint_symbol))
 
 
 def get_market(system_symbol, waypoint_symbol):
@@ -701,7 +711,7 @@ def get_market(system_symbol, waypoint_symbol):
         dict: Market information for the specified waypoint.
     """
     return queue(session.get(
-        session.base_url + "/systems/" + system_symbol + "/waypoints/" + waypoint_symbol + "/market").json())
+        session.base_url + "/systems/" + system_symbol + "/waypoints/" + waypoint_symbol + "/market"))
 
 
 def get_shipyard(system_symbol, waypoint_symbol):
@@ -716,7 +726,7 @@ def get_shipyard(system_symbol, waypoint_symbol):
         dict: Shipyard information for the specified waypoint.
     """
     return queue(session.get(
-        session.base_url + "/systems/" + system_symbol + "/waypoints/" + waypoint_symbol + "/shipyard").json())
+        session.base_url + "/systems/" + system_symbol + "/waypoints/" + waypoint_symbol + "/shipyard"))
 
 
 def get_jump_gate(system_symbol, waypoint_symbol):
@@ -731,4 +741,4 @@ def get_jump_gate(system_symbol, waypoint_symbol):
         dict: Information about the jump gate at the specified waypoint.
     """
     return queue(session.get(
-        session.base_url + "/systems/" + system_symbol + "/waypoints/" + waypoint_symbol + "/jump-gate").json())
+        session.base_url + "/systems/" + system_symbol + "/waypoints/" + waypoint_symbol + "/jump-gate"))
